@@ -1,0 +1,110 @@
+@model PersonalFinanceManager.Models.Wallet
+
+@{
+    ViewData["Title"] = "Sửa Ví";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <!-- Header -->
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0 fw-bold">💰 Sửa Ví</h4>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4">
+
+                    <form asp-action="Edit" onsubmit="return formatNumberBeforeSubmit(this)">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Tên ví -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">Tên Ví</label>
+                            <div class="input-group">
+                                <span class="input-group-text">📂</span>
+                                <input asp-for="Name" class="form-control" placeholder="Nhập tên ví..." />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Loại ví -->
+                        <div class="mb-3">
+                            <label asp-for="Type" class="form-label fw-semibold">Loại Ví</label>
+                            <select asp-for="Type" class="form-select">
+                                <option value="">-- Chọn loại ví --</option>
+                                <option value="Cash">💵 Tiền Mặt</option>
+                                <option value="Bank">🏦 Ngân Hàng</option>
+                                <option value="E-wallet">📱 Ví Điện Tử</option>
+                                <option value="Credit Card">💳 Thẻ Tín Dụng</option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Số dư -->
+                        <div class="mb-3">
+                            <label asp-for="Balance" class="form-label fw-semibold">Số Dư</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₫</span>
+                                <input asp-for="Balance"
+                                       class="form-control text-end"
+                                       type="text"
+                                       value="@Model.Balance.ToString("#,##0")"
+                                       onkeyup="formatNumber(this)"
+                                       placeholder="0" />
+                            </div>
+                            <span asp-validation-for="Balance" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-semibold">Mô Tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Ghi chú thêm..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                ← Quay Lại
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                💾 Lưu
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function formatNumber(input) {
+            // Remove all non-numeric characters
+            let value = input.value.replace(/[^\d]/g, '');
+            
+            // Format with thousand separators
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            
+            // Update input value
+            input.value = value;
+        }
+
+        function formatNumberBeforeSubmit(form) {
+            // Get the balance input
+            const balanceInput = form.querySelector('input[name="Balance"]');
+            
+            // Remove all dots before submitting
+            balanceInput.value = balanceInput.value.replace(/\./g, '');
+            
+            return true;
+        }
+    </script>
+} 

@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Trang Chủ";
+}
+
+<div class="container-fluid">
+    <div class="row min-vh-100">
+
+        <div class="welcome-container d-flex flex-column justify-content-center align-items-center text-center">
+
+            <!-- LOGO -->
+            <img src="~/icon/finance.png" class="logo mb-4" />
+
+            <!-- TITLE -->
+            <h1 class="title mb-3">EFinance</h1>
+
+            <!-- TEXT CHẠY -->
+            <h3 class="typing-text"></h3>
+
+            <!-- BUTTON -->
+            <div class="mt-4">
+                <a asp-controller="Transaction" asp-action="Index" class="btn btn-primary px-4 py-2">
+                    🚀 Bắt Đầu Ngay
+                </a>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<script>
+    const text = "Quản lý tài chính thông minh 💸";
+    let index = 0;
+
+    function typeEffect() {
+        if (index < text.length) {
+            document.querySelector(".typing-text").innerHTML += text.charAt(index);
+            index++;
+            setTimeout(typeEffect, 50);
+        }
+    }
+
+    window.onload = typeEffect;
+</script>

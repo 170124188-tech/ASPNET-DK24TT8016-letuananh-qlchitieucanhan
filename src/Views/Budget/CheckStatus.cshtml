@@ -1,0 +1,172 @@
+@model PersonalFinanceManager.Models.Budget
+
+@{
+    ViewData["Title"] = "Kiểm Tra Trạng Thái Ngân Sách";
+    var totalSpent = ViewBag.TotalSpent ?? 0;
+    var remainingAmount = Model.Amount - totalSpent;
+    var transactions = ViewBag.Transactions as List<PersonalFinanceManager.Models.Transaction> ?? new List<PersonalFinanceManager.Models.Transaction>();
+    var rawPercentage = Model.Amount > 0 ? (totalSpent / Model.Amount) * 100 : 0;
+    var percentage = Math.Min(Math.Max(rawPercentage, 0), 100); // Giới hạn phần trăm từ 0-100
+    var progressClass = rawPercentage > 100 ? "bg-danger" : (rawPercentage > 80 ? "bg-warning" : "bg-success");
+}
+
+<div class="container py-4">
+    <div class="row g-4">
+
+        <!-- ===== THÔNG TIN NGÂN SÁCH ===== -->
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4 h-100">
+
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h5 class="mb-0 fw-bold">📊 Thông Tin Ngân Sách</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Danh Mục</span>
+                        <span class="fw-semibold">@Model.Category</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Số Tiền</span>
+                        <span class="fw-bold text-primary">@Model.Amount.ToString("#,##0") ₫</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Chu Kỳ</span>
+                        <span>@Model.Period</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Bắt Đầu</span>
+                        <span>@Model.StartDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Kết Thúc</span>
+                        <span>@Model.EndDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                    <div class="mt-3">
+                        <span class="text-muted">Mô Tả</span>
+                        <div class="mt-1">@Model.Description</div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== THỐNG KÊ ===== -->
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div class="card-header bg-dark text-white text-center rounded-top-4">
+                    <h5 class="mb-0 fw-bold">💸 Thống Kê Chi Tiêu</h5>
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (transactions.Any())
+                    {
+                        <!-- TABLE -->
+                    <div class="table-responsive mb-3">
+                        <table class="table align-middle">
+                            <thead class="uppercase-sm text-muted">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Loại</th>
+                                    <th class="text-end">Số Tiền</th>
+                                    <th>Mô Tả</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in transactions)
+                                    {
+                                <tr>
+                                    <td>@transaction.TransactionDate.ToString("dd/MM/yyyy")</td>
+
+                                    <td>
+                                        <span class="badge @(transaction.Type == "Income" ? "bg-success-soft text-success" : "bg-danger-soft text-danger")">
+                                            @(transaction.Type == "Income" ? "Thu" : "Chi")
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @transaction.Amount.ToString("#,##0")
+                                    </td>
+
+                                    <td>@transaction.Description</td>
+                                </tr>
+                                    }
+                            </tbody>
+                        </table>
+                    </div>
+
+ <!-- STATS -->
+                    <div class="mb-2 d-flex justify-content-between">
+                        <span class="text-muted">Tổng Chi</span>
+                        <span class="fw-bold text-danger">@totalSpent.ToString("#,##0") ₫</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Còn Lại</span>
+                        <span class="fw-bold text-success">@remainingAmount.ToString("#,##0") ₫</span>
+                    </div>
+
+ <!-- PROGRESS -->
+                    <div class="progress mb-2" style="height: 10px;">
+                        <div class="progress-bar @progressClass"
+                             role="progressbar"
+                             style="width: @(percentage.ToString("0"))%;"
+                             aria-valuenow="@percentage"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <div class="text-end small text-muted">
+                        @rawPercentage.ToString("0")%
+                    </div>
+
+                    @if (rawPercentage > 100)
+                        {
+                    <div class="text-danger mt-2">
+                        ⚠️ Vượt ngân sách @((rawPercentage - 100).ToString("0"))%
+                    </div>
+                        }
+                    }
+                    else
+                    {
+                    <div class="text-center py-4 text-muted">
+                        📭 Không có giao dịch nào
+                    </div>
+
+                    <div class="mb-2 d-flex justify-content-between">
+                        <span class="text-muted">Tổng Chi</span>
+                        <span class="fw-bold">0 ₫</span>
+                    </div>
+
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Còn Lại</span>
+                        <span class="fw-bold text-success">@Model.Amount.ToString("#,##0") ₫</span>
+                    </div>
+
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" style="width: 0%"></div>
+                    </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="mt-4 text-center">
+        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+            ← Quay Lại
+        </a>
+    </div>
+</div>
